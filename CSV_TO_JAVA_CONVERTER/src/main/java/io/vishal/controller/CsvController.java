@@ -1,6 +1,7 @@
 package io.vishal.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import io.vishal.Model.Student;
 import io.vishal.service.CsvFileProcessor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,20 +24,22 @@ public class CsvController {
 	private CsvFileProcessor csvFileProcessor;
 
 	@PostMapping("/uploadCsv")
-	public ResponseEntity<String> uploadCsv(@RequestParam MultipartFile file){
+	public ResponseEntity<List<Student>> uploadCsv(@RequestParam MultipartFile file){
 		log.info("upload csv() called");
 		
+		List<Student> studentList;
+		
 		try {
-     	  csvFileProcessor.readAndConvertCsvFile(file);
+     	  studentList = csvFileProcessor.readAndConvertCsvFile(file);
 		
 		} catch (IOException e) {
 			log.error("Ioexception occured :: {}",ExceptionUtils.getStackTrace(e));
-			return new ResponseEntity<String>("IO exception ",HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Exception e) {
 			log.error("Exception occured :: {}",ExceptionUtils.getStackTrace(e));
-			return new ResponseEntity<String>("exception ",HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		return ResponseEntity.ok("successfully uploaded");
+		return ResponseEntity.ok(studentList);
 	}
 }
